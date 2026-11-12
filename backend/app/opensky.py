@@ -4,6 +4,7 @@ import os
 import time
 
 TOKEN_URL = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
+ROOT_URL = "https://opensky-network.org/api"
 
 class TokenManager:
     def __init__(self, client_id: str, client_secret: str, margin: int = 60):
@@ -37,13 +38,12 @@ class TokenManager:
         return self._token
 
 
-if __name__ == "__main__":
+def get_states(token: str) -> list[list]:
+    GET_STATES = ROOT_URL + "/states/all"
+    r = httpx.get(
+        GET_STATES,
+        headers={"Authorization": f"Bearer {token}"},
+        timeout=10.0)
 
-    load_dotenv()
-
-    client_id = os.getenv("CLIENT_ID")
-    client_secret = os.getenv("CLIENT_SECRET")
-
-    tokens = TokenManager(client_id, client_secret)
-    print(tokens.get()[:20])
-    print(tokens.get()[:20])
+    r.raise_for_status()
+    return r.json()["states"] or []
