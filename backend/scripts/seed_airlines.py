@@ -21,6 +21,7 @@ def main():
         conn.execute("DELETE FROM airlines")
 
         rows = []
+        seen = set()
         with open(AIRLINES_DATA, newline="", encoding="utf-8") as f:
             for record in csv.reader(f):
                 iata = clean(record[3])
@@ -30,6 +31,11 @@ def main():
 
                 if iata is None or icao is None or clean(record[7]) != "Y":
                     continue
+
+                key = (iata, icao)
+                if key in seen:
+                    continue
+                seen.add(key)
 
                 rows.append((iata, icao, name, country))
 
