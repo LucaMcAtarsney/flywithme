@@ -38,6 +38,9 @@ def airline_count(conn: sqlite3.Connection = Depends(get_db)):
 def get_flight(
     flight_number: str,
     conn: sqlite3.Connection = Depends(get_db),
-    tokens: TokenManager = Depends(get_tokens),   # ← here
+    tokens: TokenManager = Depends(get_tokens),
 ) -> Flight:
     flight = find_flight(flight_number, conn, tokens)
+    if flight is None:
+        raise HTTPException(status_code=404, detail=f"Flight {flight_number} not found")
+    return flight
